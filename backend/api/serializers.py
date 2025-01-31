@@ -1,11 +1,11 @@
-from .models import User,Issue,Department
+from .models import CustomUser,Issue,Department,Audit_Trail
 from rest_framework import serializers
 
 from api import models
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = '__all__'
         
         
@@ -26,3 +26,7 @@ class IssueSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
         
+class Audit_TrailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Audit_Trail
+        fields = '__all__'
