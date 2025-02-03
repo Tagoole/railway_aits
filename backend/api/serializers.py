@@ -10,23 +10,21 @@ class UserSerializer(serializers.ModelSerializer):
         
         
 
-
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = '__all__'
         
         
-        
-        
-        
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = '__all__'
+        depth = 1
         
         
 class Audit_TrailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audit_Trail
-        fields = '__all__'
+        fields = ['id','issue','user','action','comment','created_at','updated_at']
+        depth = 1
