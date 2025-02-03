@@ -30,7 +30,7 @@ class Issue(models.Model):
         ('appeal','Appeal'),
         ('correction','Correction'),
     ]
-    
+
     STATUS_CHOICES = [
         ('pending','Pending'),
         ('resolved','Resolved'),
