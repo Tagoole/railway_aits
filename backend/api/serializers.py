@@ -6,7 +6,7 @@ from api import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        fields = ['id','first_name','last_name','email','password','role','gender','year_of_study']
         
         
 
@@ -17,11 +17,13 @@ class DepartmentSerializer(serializers.ModelSerializer):
         
         
 class IssueSerializer(serializers.ModelSerializer):
+    student = UserSerializer()
+    #lecturer = UserSerializer()
+    registrar = UserSerializer()
+    #department = DepartmentSerializer()
     class Meta:
         model = Issue
-        fields = '__all__'
-        depth = 1
-        
+        fields = ['id','student','issue_type','course_unit_code','course_unit_name','description','image','status','created_at','updated_at','registrar']
         
 class Audit_TrailSerializer(serializers.ModelSerializer):
     class Meta:
