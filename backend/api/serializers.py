@@ -25,8 +25,3 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['id','student','issue_type','course_unit_code','course_unit_name','description','image','status','created_at','updated_at','registrar']
         
-class Audit_TrailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Audit_Trail
-        fields = ['id','issue','user','action','comment','created_at','updated_at']
-        depth = 1
