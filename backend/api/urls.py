@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import IssueViewSet,DepartmentViewSet,Audit_TrailViewSet
 from rest_framework.routers import DefaultRouter
-
+from .views import RegisterAPI
 router = DefaultRouter()
 router.register(r'issues', IssueViewSet,'issues')
 router.register(r'department',DepartmentViewSet,'department')

@@ -33,3 +33,18 @@ class Audit_TrailSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password', 'gender']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        if data['username']:
+            if CustomUser.objects.filter(username=data.get('username')).exists():
+                raise serializers.ValidationError("Username already exists.")
+
+        if data['email']:
+            if CustomUser.objects.filter(email=data.get('email')).exists():
+                raise serializers.ValidationError("Email already taken.")
+        return data
