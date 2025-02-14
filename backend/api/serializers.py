@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from api import models
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -30,3 +31,5 @@ class Audit_TrailSerializer(serializers.ModelSerializer):
         model = Audit_Trail
         fields = ['id','issue','user','action','comment','created_at','updated_at']
         depth = 1
+
+

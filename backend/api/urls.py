@@ -9,4 +9,5 @@ router.register(r'audit_trail',Audit_TrailViewSet,'audit_trail')
 
 urlpatterns = [
     path('',include(router.urls))
+   
 ]
