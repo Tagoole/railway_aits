@@ -1,4 +1,4 @@
-from .models import CustomUser,Issue,Department,Audit_Trail
+from .models import CustomUser,Issue,Department
 from rest_framework import serializers
 
 from api import models

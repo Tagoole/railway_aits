@@ -72,28 +72,3 @@ class Issue(models.Model):
         return self.issue_type
 
 #class Image(models.Model)
-
-class Audit_Trail(models.Model):
-    ACTION_CHOICES = [
-        ('created','Created'),
-        ('assigned','Assigned'),
-        ('resolved','Resolved'),
-        ('updated','Updated'),
-        ('forwarded','Forwarded'),
-        ('closed','Closed'),
-    ]
-    
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE,related_name='audit_trail',)
-    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    action = models.CharField(max_length=20, choices = ACTION_CHOICES,default = 'created')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now = True)
-    comment = models.TextField(blank=True,null = True)
-    previous_status = models.CharField(blank = True, null = True,max_length=30)
-    new_status = models.CharField(blank = True, null = True,max_length=30)
-    
-    def __str__(self):
-        return f"{self.user.username}-{self.action} on {self.issue} at {self.updated_at}"
-    
-    class Meta:
-        ordering = ['updated_at','created_at']
