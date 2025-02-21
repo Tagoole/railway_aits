@@ -1,6 +1,5 @@
-from .models import CustomUser,Issue,Department
+from .models import CustomUser,Issue,Department,Course_unit
 from rest_framework import serializers
-
 from api import models
 
 
@@ -10,7 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','first_name','last_name','email','password','role','gender','year_of_study']
         
         
+class Course_unitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course_unit
+        fields = "__all__"
 
+        
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
@@ -19,9 +23,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
         
 class IssueSerializer(serializers.ModelSerializer):
     student = UserSerializer()
-    #lecturer = UserSerializer()
     registrar = UserSerializer()
-    #department = DepartmentSerializer()
     class Meta:
         model = Issue
         fields = ['id','student','issue_type','course_unit_code','course_unit_name','description','image','status','created_at','updated_at','registrar']

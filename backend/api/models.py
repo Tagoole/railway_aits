@@ -40,6 +40,15 @@ class Department(models.Model):
     
     
 
+class Course_unit(models.Model):
+    course_unit_code = models.CharField(max_length=10)
+    course_unit_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.course_unit_name
+    
+
+
 class Issue(models.Model):
     ISSUE_CHOICES = [
         ('missing_marks','Missing Marks'),
@@ -55,8 +64,7 @@ class Issue(models.Model):
     
     student = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null = True, related_name='issues', limit_choices_to={'role':'student'})
     issue_type = models.CharField(max_length=30, choices = ISSUE_CHOICES)
-    course_unit_code = models.CharField(max_length=30)
-    course_unit_name = models.CharField(max_length=150)
+    course_unit = models.ForeignKey(Course_unit,on_delete= models.CASCADE, null = True)
     description = models.TextField()
     image = models.ImageField(upload_to='images/',null = True)
     status = models.CharField(max_length=30, choices = STATUS_CHOICES, default = 'pending')
@@ -70,5 +78,4 @@ class Issue(models.Model):
     
     def __str__(self):
         return self.issue_type
-
-#class Image(models.Model)
+    
