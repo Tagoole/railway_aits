@@ -10,7 +10,6 @@ class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('student','Student'),
         ('lecturer','lecturer'),
-        ('head_of_department','Head of Department'),
         ('academic_registrar','academic_registrar'),
     ]
     STUDY_YEARS = [
