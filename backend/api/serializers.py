@@ -26,7 +26,7 @@ class IssueSerializer(serializers.ModelSerializer):
     registrar = UserSerializer()
     class Meta:
         model = Issue
-        fields = ['id','student','issue_type','course_unit_code','course_unit_name','description','image','status','created_at','updated_at','registrar']
+        fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar']
         
 
 

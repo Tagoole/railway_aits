@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
 
 class IssueViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     parser_classes = (MultiPartParser,FormParser)
@@ -15,6 +16,7 @@ class IssueViewSet(ModelViewSet):
     
     
 class DepartmentViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
 
