@@ -6,12 +6,18 @@ from .models import CustomUser,Department,Issue,Course_unit
 from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
+from django.contrib.auth.models import Group
 
 class IssueViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     parser_classes = (MultiPartParser,FormParser)
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
     
     
     
@@ -44,3 +50,16 @@ class Registration(APIView):
                 "data":validated_data
             }, status= status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def assign_user_group(self, user):
+        """Assign user to a group based on their role."""
+        role_to_group = {
+            "student": "Students",
+            "lecturer": "Lecturers",
+            "academic_registrar": "Registrars"
+        }
+        
+        group_name = role_to_group.get(user.role)  # Get the group name based on role
+        if group_name:
+            group, created = Group.objects.get_or_create(name=group_name)  # Ensure group exists
+            user.groups.add(group)

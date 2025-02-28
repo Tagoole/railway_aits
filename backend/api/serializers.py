@@ -28,6 +28,13 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar']
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            if request.user.role == 'student':
+                self.fields.pop('lecturer', None)
+        
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -45,3 +52,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             if CustomUser.objects.filter(email=data.get('email')).exists():
                 raise serializers.ValidationError("Email already taken.")
         return data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            if request.user.role != 'student':
+                self.fields.pop('year_of_study', None)
+    
