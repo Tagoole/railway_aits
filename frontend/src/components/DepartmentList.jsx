@@ -21,8 +21,7 @@ const DepartmentList = () => {
       <ul>
         {departments.map((dept) => (
           <li key={dept.id}>
-            <strong>{dept.department_name}</strong>
-            <p>{dept.description}</p>
+            <strong>{dept.department_name}</strong><p>{dept.description}</p>
           </li>
         ))}
       </ul>

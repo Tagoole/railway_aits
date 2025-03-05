@@ -28,8 +28,8 @@ class CustomUserAdmin(UserAdmin):
 
 
 
-    
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(CustomUser)    
+#admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Department)
 admin.site.register(Course_unit)

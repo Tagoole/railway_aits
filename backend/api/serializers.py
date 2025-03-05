@@ -6,7 +6,7 @@ from api import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id','first_name','last_name','email','password','role','gender','year_of_study']
+        fields = ['id','first_name','last_name','username','email','password','role','gender','year_of_study']
         
         
 class Course_unitSerializer(serializers.ModelSerializer):
@@ -20,14 +20,18 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = '__all__'
         
-        
+class LimitedUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username']
+            
 class IssueSerializer(serializers.ModelSerializer):
-    student = UserSerializer()
-    registrar = UserSerializer()
+    student = LimitedUserSerializer()
+    registrar = LimitedUserSerializer()
     class Meta:
         model = Issue
         fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar']
-        
+    '''    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
@@ -35,7 +39,7 @@ class IssueSerializer(serializers.ModelSerializer):
             if request.user.role == 'student':
                 self.fields.pop('lecturer', None)
         
-
+'''
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,11 +56,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             if CustomUser.objects.filter(email=data.get('email')).exists():
                 raise serializers.ValidationError("Email already taken.")
         return data
-
+'''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             if request.user.role != 'student':
                 self.fields.pop('year_of_study', None)
-    
+   ''' 
