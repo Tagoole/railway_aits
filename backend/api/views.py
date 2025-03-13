@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from .serializers import IssueSerializer,DepartmentSerializer,Course_unitSerializer,RegisterSerializer
-from rest_framework.decorators import APIView
-from .models import CustomUser,Department,Issue,Course_unit
+from .serializers import *
+from rest_framework.decorators import APIView, api_view
+from .models import *
 from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -31,14 +31,21 @@ class Course_unitViewSet(ModelViewSet):
     queryset = Course_unit.objects.all()
     serializer_class = Course_unitSerializer
 
-
-
+class ProgramViewSet(ModelViewSet):
+    queryset = Program.objects.all()
+    serializer_class = ProgramSerializer
+    
+    
+'''
+registration token
+'''
 class Registration(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
         data = request.data 
         serializer = RegisterSerializer(data=data)
         if serializer.is_valid():
+            print(data)
             validated_data = serializer.validated_data
             password = validated_data.pop('password')
             
@@ -63,3 +70,6 @@ class Registration(APIView):
         if group_name:
             group, created = Group.objects.get_or_create(name=group_name)  # Ensure group exists
             user.groups.add(group)
+
+
+    
