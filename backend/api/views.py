@@ -39,7 +39,28 @@ class ProgramViewSet(ModelViewSet):
 '''
 registration token
 '''
-class Registration(APIView):
+class Lecturer_and_Registrar_Registration(APIView):
+    permission_classes = [AllowAny]
+    def post(self,request):
+        serializer = Lecturer_and_Registrar_RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()  # Save user using serializer
+            return Response({
+                "message": "User Created Successfully",
+                "user": {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "email": user.email,
+                    "gender": user.gender,
+                    "program": user.program.id if user.program else None,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class Student_Registration(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = Student_RegisterSerializer(data=request.data)
