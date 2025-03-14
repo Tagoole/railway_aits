@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import shortuuid
 
 # add other option in issue dropdown
 class CustomUser(AbstractUser):
