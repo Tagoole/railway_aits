@@ -41,23 +41,24 @@ registration token
 '''
 class Registration(APIView):
     permission_classes = [AllowAny]
-    def post(self,request):
-        data = request.data 
-        serializer = RegisterSerializer(data=data)
+    def post(self, request):
+        serializer = Student_RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            print(data)
-            validated_data = serializer.validated_data
-            password = validated_data.pop('password')
-            
-            user = CustomUser(**validated_data)
-            user.set_password(password)
-            user.save()
+            user = serializer.save()  # Save user using serializer
             return Response({
-                "message":"User Created Successfully",
-                "data":validated_data
-            }, status= status.HTTP_201_CREATED)
+                "message": "User Created Successfully",
+                "user": {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "email": user.email,
+                    "gender": user.gender,
+                    "program": user.program.id if user.program else None,
+                }
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+    '''
     def assign_user_group(self, user):
         """Assign user to a group based on their role."""
         role_to_group = {
@@ -71,5 +72,7 @@ class Registration(APIView):
             group, created = Group.objects.get_or_create(name=group_name)  # Ensure group exists
             user.groups.add(group)
 
+    '''
+    
 
     

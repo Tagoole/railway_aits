@@ -13,20 +13,18 @@ class CustomUser(AbstractUser):
         ('lecturer','lecturer'),
         ('academic_registrar','academic_registrar'),
     ]
-    STUDY_YEARS = [
-        ('1st_year','1st Year'),
-        ('2nd_year','2nd Year'),
-        ('3rd_year','3rd Year'),
-        ('4th_year','4th Year'),
-        ('5th_year','5th Year')
-    ]
+    
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    username = models.CharField(max_length=100,unique=True,null=False,blank = False)
+    email = models.EmailField(unique=True)
+    confirm_password = models.CharField(max_length=50)
     role = models.CharField(max_length=30, choices = ROLE_CHOICES, default = 'student')
     image = models.ImageField(upload_to='profile_pictures/', null = True, blank = True)
-    gender = models.CharField(max_length = 20,choices = GENDER_CHOICES, null = True, editable = True)
-    program = models.ForeignKey('Program',on_delete= models.CASCADE, related_name='programs', null = True, blank = True)
-    year_of_study = models.CharField(max_length=20,blank = True, null = True, choices = STUDY_YEARS)    
-    city = models.CharField(max_length=30, null = True, editable = True)
-    
+    gender = models.CharField(max_length = 20,choices = GENDER_CHOICES,editable = True)
+    program = models.ForeignKey('Program',on_delete= models.CASCADE, related_name='programs',null = True, blank=True)    
+    city = models.CharField(max_length=30, editable = True)
+    token = models.CharField(max_length=50, null = True, blank = True)
     
     def __str__(self):
         return self.username
@@ -70,17 +68,26 @@ class Issue(models.Model):
         ('two','Two')
     ]
     
+    STUDY_YEARS = [
+        ('1st_year','1st Year'),
+        ('2nd_year','2nd Year'),
+        ('3rd_year','3rd Year'),
+        ('4th_year','4th Year'),
+        ('5th_year','5th Year')
+    ]
+    
     student = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null = True, related_name='issues', limit_choices_to={'role':'student'})
     issue_type = models.CharField(max_length=30, choices = ISSUE_CHOICES)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
-    course_unit = models.ForeignKey(Course_unit,on_delete= models.CASCADE, null = True)
+    course_unit = models.ForeignKey(Course_unit,on_delete= models.CASCADE)
     description = models.TextField()
-    image = models.ImageField(upload_to='issues/',null = True)
+    image = models.ImageField(upload_to='issues/',null = True,blank= True)
     status = models.CharField(max_length=30, choices = STATUS_CHOICES, default = 'pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     lecturer = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null = True, related_name = "lecturer_issues",limit_choices_to={'role':'lecturer'})
     registrar = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null = True, related_name = "registrar_issues",limit_choices_to={'role':'academic_registrar'}) 
+    year_of_study = models.CharField(max_length=20,choices = STUDY_YEARS)
     semester = models.CharField(max_length = 10,choices = SEMESTER_CHOICES)
 
     class Meta:
