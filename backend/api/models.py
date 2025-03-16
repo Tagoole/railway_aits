@@ -96,3 +96,11 @@ class Issue(models.Model):
     def __str__(self):
         return self.issue_type
     
+class Registration_Token(models.Model):
+    ROLE_CHOICES = [
+        ('lecturer','lecturer'),
+        ('academic_registrar','academic_registrar'),
+    ]
+    role = models.CharField(max_length=20, choices = ROLE_CHOICES)
+    email = models.EmailField(unique=True)
+    token = models.CharField(default=shortuuid.uuid,max_length=50)

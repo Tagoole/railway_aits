@@ -95,5 +95,9 @@ class Student_Registration(APIView):
 
     '''
     
+class Registration_Token_viewset(ModelViewSet):
+    queryset = Registration_Token.objects.all()
+    serializer_class = Registration_TokenSerializer
+    http_method_names = ['get','post','delete']
 
     
