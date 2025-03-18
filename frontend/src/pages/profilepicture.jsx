@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import makererelogo from '../assets/makererelogo.png'; // Import the Makerere logo
-import Vector from '../assets/Vector.png'; // Import the vector image
+import upload from '../assets/upload.png'; // Import the vector image
 import './profilepicture.css'; // Import the corresponding CSS file
 
 const ProfilePictureSetup = () => {
@@ -34,7 +34,7 @@ const ProfilePictureSetup = () => {
       <div className="current-picture">
         <h3>Current Picture</h3>
         {currentPicture ? (
-          <img src={Vector} alt="vector" className="vector" />
+          <img src={upload} alt="upload" className="upload" />
         ) : (
           <p>None</p>
         )}
