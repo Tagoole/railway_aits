@@ -1,4 +1,4 @@
-from .models import CustomUser,Issue,Department,Course_unit
+from .models import *
 from rest_framework import serializers
 from api import models
 
@@ -19,48 +19,93 @@ class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = '__all__'
-        
-class LimitedUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['username']
             
 class IssueSerializer(serializers.ModelSerializer):
-    student = LimitedUserSerializer()
-    registrar = LimitedUserSerializer()
+    student = serializers.StringRelatedField()
+    registrar = serializers.StringRelatedField()
+    course_unit = Course_unitSerializer()
     class Meta:
         model = Issue
-        fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar']
-    '''    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            if request.user.role == 'student':
-                self.fields.pop('lecturer', None)
-        
-'''
+        fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar','year_of_study','semester']
 
-class RegisterSerializer(serializers.ModelSerializer):
+class Student_RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password', 'gender']
-        extra_kwargs = {'password': {'write_only': True}}
+        #fields = "__all__"
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password','confirm_password', 'gender','program']
+        
+        
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'confirm_password': {'write_only': True},
+            }
 
     def validate(self, data):
-        if data['username']:
-            if CustomUser.objects.filter(username=data.get('username')).exists():
-                raise serializers.ValidationError("Username already exists.")
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        if CustomUser.objects.filter(username=data.get('username')).exists():
+            raise serializers.ValidationError("Username already exists.")
 
-        if data['email']:
-            if CustomUser.objects.filter(email=data.get('email')).exists():
-                raise serializers.ValidationError("Email already taken.")
+    
+        if CustomUser.objects.filter(email=data.get('email')).exists():
+            raise serializers.ValidationError("Email already taken.")
+        
+        if password != confirm_password:
+            raise serializers.ValidationError("Passwords don't match....")
+        
         return data
-'''
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            if request.user.role != 'student':
-                self.fields.pop('year_of_study', None)
-   ''' 
+    
+    def create(self, validated_data):
+        """Create a new user with hashed password."""
+        password = validated_data.pop('password')  # Extract password
+        user = CustomUser(**validated_data)  # Create user instance without saving
+        user.set_password(password)  # Hash the password
+        user.save()  # Save user with hashed password
+        return user
+
+class Lecturer_and_Registrar_RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        #fields = "__all__"
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password','confirm_password', 'gender','token']
+        
+        
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'confirm_password': {'write_only': True},
+            }
+
+    def validate(self, data):
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        if CustomUser.objects.filter(username=data.get('username')).exists():
+            raise serializers.ValidationError("Username already exists.")
+
+    
+        if CustomUser.objects.filter(email=data.get('email')).exists():
+            raise serializers.ValidationError("Email already taken.")
+        
+        if password != confirm_password:
+            raise serializers.ValidationError("Passwords don't match....")
+        
+        return data
+    
+    def create(self, validated_data):
+        """Create a new user with hashed password."""
+        password = validated_data.pop('password')  # Extract password
+        user = CustomUser(**validated_data)  # Create user instance without saving
+        user.set_password(password)  # Hash the password
+        user.save()  # Save user with hashed password
+        return user
+    
+    
+class ProgramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Program
+        fields = '__all__'
+
+
+class Registration_Token_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration_Token
+        fields = '__all__'

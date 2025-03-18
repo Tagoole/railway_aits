@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from .serializers import IssueSerializer,DepartmentSerializer,Course_unitSerializer,RegisterSerializer
-from rest_framework.decorators import APIView
-from .models import CustomUser,Department,Issue,Course_unit
+from .serializers import *
+from rest_framework.decorators import APIView, api_view
+from .models import *
 from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -31,26 +31,55 @@ class Course_unitViewSet(ModelViewSet):
     queryset = Course_unit.objects.all()
     serializer_class = Course_unitSerializer
 
-
-
-class Registration(APIView):
+class ProgramViewSet(ModelViewSet):
+    queryset = Program.objects.all()
+    serializer_class = ProgramSerializer
+    
+    
+'''
+registration token
+'''
+class Lecturer_and_Registrar_Registration(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
-        data = request.data 
-        serializer = RegisterSerializer(data=data)
+        serializer = Lecturer_and_Registrar_RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            validated_data = serializer.validated_data
-            password = validated_data.pop('password')
-            
-            user = CustomUser(**validated_data)
-            user.set_password(password)
-            user.save()
+            user = serializer.save()  # Save user using serializer
             return Response({
-                "message":"User Created Successfully",
-                "data":validated_data
-            }, status= status.HTTP_201_CREATED)
+                "message": "User Created Successfully",
+                "user": {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "email": user.email,
+                    "gender": user.gender,
+                    "program": user.program.id if user.program else None,
+                }
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
+    
+class Student_Registration(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        serializer = Student_RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()  # Save user using serializer
+            return Response({
+                "message": "User Created Successfully",
+                "user": {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "email": user.email,
+                    "gender": user.gender,
+                    "program": user.program.id if user.program else None,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    '''
     def assign_user_group(self, user):
         """Assign user to a group based on their role."""
         role_to_group = {
@@ -63,3 +92,12 @@ class Registration(APIView):
         if group_name:
             group, created = Group.objects.get_or_create(name=group_name)  # Ensure group exists
             user.groups.add(group)
+
+    '''
+    
+class Registration_Token_viewset(ModelViewSet):
+    queryset = Registration_Token.objects.all()
+    serializer_class = Registration_TokenSerializer
+    http_method_names = ['get','post','delete']
+
+    
