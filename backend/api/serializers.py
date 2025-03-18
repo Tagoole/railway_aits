@@ -103,3 +103,9 @@ class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
         fields = '__all__'
+
+
+class Registration_Token_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration_Token
+        fields = '__all__'
