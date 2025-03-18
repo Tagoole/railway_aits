@@ -1,8 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import IssueList from "./components/IssueList"; // Previously created component
-import DepartmentList from "./components/DepartmentList"; // New component
-import Frame from "./pages/password"; // New component
+
+
 import Signin from "./pages/Signin"; // New component
 import EmailVerification from "./pages/verification"; // New component
 import ResetPassword from "./pages/reset"; // New component
@@ -27,8 +26,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DepartmentList />} />
-        <Route path="/issues" element={<IssueList />} />
+        
+      
        
         <Route path="/signin" element={<Signin />} />
         <Route path="/verification" element={<EmailVerification />} />
