@@ -29,6 +29,7 @@ function App() {
         
       
        
+        {/* <Route path="/signin" element={<Signin />} /> */}
         <Route path="/signin" element={<Signin />} />
         <Route path="/verification" element={<EmailVerification />} />
         <Route path="/reset" element={<ResetPassword />} />
