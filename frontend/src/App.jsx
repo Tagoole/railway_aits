@@ -24,7 +24,20 @@ function App() {
   // );
 
   return (
-
+    <Router>
+      <Routes>
+        
+      
+       
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/verification" element={<EmailVerification />} />
+        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profilesetup" element={<ProfileSetup />} />
+        <Route path="/profilepicture" element={<ProfilePictureSetup />} />
+      </Routes>
+    </Router>
+  )
 }
 
 export default App;
