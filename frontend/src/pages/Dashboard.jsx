@@ -1,7 +1,7 @@
 import React from 'react';
-import makererelogo from '../assets/makererelogo.png'; // Import the Makerere logo image
-import knowledge from '../assets/knowledge.png'; // Import the Knowledge image
-import './Dashboard.css'; // Import the corresponding CSS file
+import libraryImage from '../assets/student.png'; // Import the library image (you'll need to add this)
+import dashboardIcon from '../assets/knowledge.png'; // Import dashboard icon (you'll need to add this)
+import './Dashboard.css';
 
 const DashboardSetup = () => {
   const handleStartSetup = () => {
@@ -10,18 +10,29 @@ const DashboardSetup = () => {
   };
 
   return (
-    <div className="container">
-      <img src={makererelogo} alt="Makerere Logo" className="logo" />
-      <h1 className="title">Academic Issue Tracking System</h1>
-      <h2 className="welcome">Welcome!</h2>
-      <p className="description">This is your Dashboard setup</p>
-      <p className="description">
-        Help us customize your account and preferences to get started quickly.
-      </p>
-      <button onClick={handleStartSetup} className="button">
-        Start Setup
-      </button>
-      <img src={knowledge} alt="Knowledge" className="knowledge-image" />
+    <div className="dashboard-setup-container">
+      <div className="split-layout">
+        <div className="left-section">
+          <img src={libraryImage} alt="Library" className="library-image" />
+        </div>
+        
+        <div className="right-section">
+          <div className="setup-content">
+            <h1 className="welcome-title">Welcome!</h1>
+            <h2 className="setup-subtitle">This is your Dashboard setup</h2>
+            
+            <p className="setup-description">
+              Help us customize your account and preferences to get started quickly.
+            </p>
+            
+            <img src={dashboardIcon} alt="Dashboard" className="dashboard-icon" />
+            
+            <button onClick={handleStartSetup} className="setup-button">
+              Start Setup
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
