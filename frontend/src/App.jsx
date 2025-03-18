@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 
 
 import Signin from "./pages/Signin"; // New component
@@ -29,7 +29,6 @@ function App() {
         
       
        
-        {/* <Route path="/signin" element={<Signin />} /> */}
         <Route path="/signin" element={<Signin />} />
         <Route path="/verification" element={<EmailVerification />} />
         <Route path="/reset" element={<ResetPassword />} />
