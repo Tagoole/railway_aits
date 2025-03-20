@@ -18,13 +18,14 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=100)
     username = models.CharField(max_length=100,unique=True,null=False,blank = False)
     email = models.EmailField(unique=True)
+    is_email_verified = models.BooleanField(default=False)
     confirm_password = models.CharField(max_length=50)
     role = models.CharField(max_length=30, choices = ROLE_CHOICES)
     image = models.ImageField(upload_to='profile_pictures/', null = True, blank = True)
     gender = models.CharField(max_length = 20,choices = GENDER_CHOICES,editable = True)
     program = models.ForeignKey('Program',on_delete= models.CASCADE, related_name='programs',null = True, blank=True)    
     city = models.CharField(max_length=30, editable = True)
-    token = models.CharField(max_length=50)
+    token = models.CharField(max_length=50,null= True)
     
     def __str__(self):
         return self.username
@@ -54,6 +55,8 @@ class Program(models.Model):
     def __str__(self):
         return self.program_name
 
+
+# User doesnot need to select program because it is already in the system
 class Issue(models.Model):
     ISSUE_CHOICES = [
         ('missing_marks','Missing Marks'),
@@ -81,7 +84,6 @@ class Issue(models.Model):
     
     student = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null = True, related_name='issues', limit_choices_to={'role':'student'})
     issue_type = models.CharField(max_length=30, choices = ISSUE_CHOICES)
-    program = models.ForeignKey(Program, on_delete=models.CASCADE)
     course_unit = models.ForeignKey(Course_unit,on_delete= models.CASCADE)
     description = models.TextField()
     image = models.ImageField(upload_to='issues/',null = True,blank= True)

@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth.models import Group
 
 class IssueViewSet(ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     parser_classes = (MultiPartParser,FormParser)
@@ -45,6 +45,7 @@ class Lecturer_and_Registrar_Registration(APIView):
         token_object = Registration_Token.objects.filter(token=token_value, email=email_value).first()
         if token_object:
             data['role'] = token_object.role 
+            data['is_email_verified'] = True
             print("Updated data:", data)
             
             
@@ -62,6 +63,7 @@ class Lecturer_and_Registrar_Registration(APIView):
                     "gender": user.gender,
                     "role":user.role,
                     "program": user.program.id if user.program else None,
+                    "is_email_verified": user.is_email_verified,
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -81,26 +83,13 @@ class Student_Registration(APIView):
                     "last_name": user.last_name,
                     "username": user.username,
                     "email": user.email,
+                    "role":user.role,
                     "gender": user.gender,
                     "program": user.program.id if user.program else None,
+                    "is_email_verified": user.is_email_verified,
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    '''
-    def assign_user_group(self, user):
-        """Assign user to a group based on their role."""
-        role_to_group = {
-            "student": "Students",
-            "lecturer": "Lecturers",
-            "academic_registrar": "Registrars"
-        }
-        
-        group_name = role_to_group.get(user.role)  # Get the group name based on role
-        if group_name:
-            group, created = Group.objects.get_or_create(name=group_name)  # Ensure group exists
-            user.groups.add(group)
-
-    '''
     
 class Registration_Token_viewset(ModelViewSet):
     queryset = Registration_Token.objects.all()

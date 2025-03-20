@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework import serializers
 from api import models
+from django.contrib.auth.models import Group
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,10 +37,10 @@ class IssueSerializer(serializers.ModelSerializer):
     student = serializers.StringRelatedField()
     registrar = serializers.StringRelatedField()
     course_unit = Course_unitSerializer()
-    program = ProgramSerializer()
+    #program = ProgramSerializer()
     class Meta:
         model = Issue
-        fields = ['id','student','issue_type','program','course_unit','description','image','status','created_at','updated_at','registrar','year_of_study','semester']
+        fields = ['id','student','issue_type','course_unit','description','image','status','created_at','updated_at','registrar','year_of_study','semester']
 
 class Student_RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,6 +79,7 @@ class Student_RegisterSerializer(serializers.ModelSerializer):
         validated_data["role"] = 'student'
         validated_data["token"] = None
         print(validated_data)
+        
         user = CustomUser(**validated_data)  # Create user instance without saving
         user.set_password(password)  # Hash the password
         user.save()  # Save user with hashed password
@@ -119,9 +121,10 @@ class Lecturer_and_Registrar_RegisterSerializer(serializers.ModelSerializer):
         """Create a new user with hashed password."""
         print(validated_data)
         password = validated_data.pop('password')  # Extract password
+        role = validated_data.get('role')
         groups = validated_data.pop('groups', []) if 'groups' in validated_data else []
         user_permissions = validated_data.pop('user_permissions', []) if 'user_permissions' in validated_data else []
-
+        
         user = CustomUser(**validated_data)  # Create user instance without saving
         user.set_password(password)  # Hash the password
         if groups:
@@ -131,6 +134,9 @@ class Lecturer_and_Registrar_RegisterSerializer(serializers.ModelSerializer):
             user.user_permissions.set(user_permissions)
 
         user.save()
+        
+        group,created = Group.objects.get_or_create(name = role)
+        user.groups.add(group)
         return user
     
     
