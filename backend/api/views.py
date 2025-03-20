@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail,EmailMessage,EmailMultiAlternatives
 from django.conf import settings
+from random import randint
 
 class IssueViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -73,12 +74,32 @@ class Lecturer_and_Registrar_Registration(APIView):
 class Student_Registration(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        serializer = Student_RegisterSerializer(data=request.data)
+        data=request.data
+        serializer = Student_RegisterSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()  # Save user using serializer
+            '''Creating and saving the verification code object..'''
+            
+            verification_code = randint(10000,99999)
+            verification,created = Verification_code.objects.get_or_create(
+                user = user,
+                defaults={"code": verification_code})
+            
+            verification.code = verification_code
+            verification.save()
+            
+            '''Sending the email...'''
+            subject = 'Email verification Code..'
+            message = f"Hello, your Verification code is: {verification_code}"
+            receipient_email= data.get('email')
+            
+            try:
+                send_mail(subject,message,settings.EMAIL_HOST_USER,[receipient_email],fail_silently=False)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response({
-                "message": "User Created Successfully",
-                "user": {
+                    "message": "User Created Successfully, Token created and email sent!",
+                    "user": {
                     "id": user.id,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
@@ -88,8 +109,8 @@ class Student_Registration(APIView):
                     "gender": user.gender,
                     "program": user.program.id if user.program else None,
                     "is_email_verified": user.is_email_verified,
-                }
-            }, status=status.HTTP_201_CREATED)
+                
+                    }}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class Registration_Token_viewset(ModelViewSet):
@@ -105,10 +126,10 @@ class Registration_Token_viewset(ModelViewSet):
             
             subject = "Your Registration Token for the Academic Issue Tracking System"
             message = f"Hello, your registration token is: {token_instance.token}"
-            recipient_email = token_instance.email
+            receipient_email = token_instance.email
             
             try:
-                send_mail(subject,message,settings.EMAIL_HOST_USER,[recipient_email],fail_silently=False,)
+                send_mail(subject,message,settings.EMAIL_HOST_USER,[receipient_email],fail_silently=False)
                 return Response({"message": "Token created and email sent!"}, status=status.HTTP_201_CREATED)
             
             

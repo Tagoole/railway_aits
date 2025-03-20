@@ -114,3 +114,13 @@ class Registration_Token(models.Model):
     
     def __str__(self):
         return f'Token for {self.email}'
+    
+
+class Verification_code(models.Model):
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
+    code = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_code_active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f'Verification for {self.user.username} '
