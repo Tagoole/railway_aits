@@ -109,3 +109,8 @@ class Registration_Token(models.Model):
     role = models.CharField(max_length=20, choices = ROLE_CHOICES)
     email = models.EmailField(unique=True)
     token = models.CharField(default=shortuuid.uuid,max_length=50)
+    
+    
+    
+    def __str__(self):
+        return f'Token for {self.email}'

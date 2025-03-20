@@ -7,12 +7,13 @@ from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth.models import Group
+from django.core.mail import send_mail,EmailMessage,EmailMultiAlternatives
+from django.conf import settings
 
 class IssueViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
-    parser_classes = (MultiPartParser,FormParser)
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -95,5 +96,25 @@ class Registration_Token_viewset(ModelViewSet):
     queryset = Registration_Token.objects.all()
     serializer_class = Registration_Token_Serializer
     http_method_names = ['get','post','delete']
+    
+    def create(self,request):
+        serializer = self.get_serializer(data = request.data)
+        
+        if serializer.is_valid():
+            token_instance = serializer.save()
+            
+            subject = "Your Registration Token for the Academic Issue Tracking System"
+            message = f"Hello, your registration token is: {token_instance.token}"
+            recipient_email = token_instance.email
+            
+            try:
+                send_mail(subject,message,settings.EMAIL_HOST_USER,[recipient_email],fail_silently=False,)
+                return Response({"message": "Token created and email sent!"}, status=status.HTTP_201_CREATED)
+            
+            
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
     

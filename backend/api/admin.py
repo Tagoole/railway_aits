@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Department,Issue,Course_unit,Program
+from .models import *
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -35,3 +35,4 @@ admin.site.register(CustomUser)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Department)
 admin.site.register(Course_unit)
+admin.site.register(Registration_Token)
