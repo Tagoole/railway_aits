@@ -14,11 +14,6 @@ class IssueViewSet(ModelViewSet):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({"request": self.request})
-        return context
-    
 class Registrar_Issue_ManagementViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = IssueSerializer
@@ -165,12 +160,42 @@ def verify_email(request):
             return Response({'Message':'Email verified successfully...'},status = status.HTTP_200_OK)
         
         
-    except Verification_code.DoesNotExist():
+    except:
         return Response({'error':'Invalid Verification code'},status = status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
 def resend_verification_code(request):
-    pass
-  
+    data = request.data
+    user = data.get('user')
+    try:
+        user_codes = Verification_code.objects.filter(user = user)
+        if user_codes:
+            user_codes.delete()
+        verification_code = randint(10000,99999)
+        verification,created = Verification_code.objects.get_or_create(
+                user = user,
+                defaults={"code": verification_code})
+            
+        verification.code = verification_code
+        verification.save()
+        
+        subject = 'Email verification Code Resend..'
+        message = f"Hello, your Verification code is: {verification_code}"
+        receipient_email= data.get('email')
+            
+        try:
+            send_mail(subject,message,settings.EMAIL_HOST_USER,[receipient_email],fail_silently=False)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+    except Exception as e:
+        return Response({'Error':f'{e}'})
+    
+    
+
+@api_view(['POST'])
+def password_reset_code(request):
+    pass  
   
       

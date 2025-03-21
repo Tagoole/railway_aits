@@ -23,5 +23,6 @@ urlpatterns = [
     path('register_lect_and_registrar/',Lecturer_and_Registrar_Registration.as_view(),name='register_lect_and_registrar'),
     path("access_token/",TokenObtainPairView.as_view(),name = "access_token"),
     path("refresh_token/",TokenRefreshView.as_view(),name = "refresh_token"),
-    path("verify_email/",verify_email,name='verify_email')
+    path("verify_email/",verify_email,name='verify_email'),
+    path('resend_verify_code/',resend_verification_code,name='resend_verify_code')
 ]

@@ -152,3 +152,7 @@ class Registration_Token_Serializer(serializers.ModelSerializer):
     
 class Verify_Email_serializer(serializers.Serializer):
     code = serializers.IntegerField()
+    
+    
+class Password_ResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
