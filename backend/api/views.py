@@ -13,6 +13,21 @@ class IssueViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
+class Lecturer_Issue_Manangement(ModelViewSet):
+    serializer_class = IssueSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self): 
+        user = self.request.user
+        return Issue.objects.filter(lecturer = user)
+    
+class Student_Issue_ReadOnlyViewset(ReadOnlyModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = IssueSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Issue.objects.filter(student = user)
     
 class Registrar_Issue_ManagementViewSet(ModelViewSet):
     permission_classes = [AllowAny]
@@ -83,7 +98,7 @@ class Student_Registration(APIView):
                 defaults={"code": verification_code})
             
             verification.code = verification_code
-            verification_code.created_at = timezone.now()
+            #verification_code.created_at = timezone.now()
             verification.save()
             
             '''Sending the email...'''
