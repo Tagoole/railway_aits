@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import shortuuid
+from django.utils import timezone
 
 # add other option in issue dropdown
 class CustomUser(AbstractUser):
@@ -120,7 +121,11 @@ class Verification_code(models.Model):
     user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
     code = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    is_code_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    
+    def is_verification_code_expired(self):
+        expiration_time = self.created_at + timezone.timedelta(minutes=10)
+        return timezone.now() > expiration_time
     
     def __str__(self):
         return f'Verification for {self.user.username} '

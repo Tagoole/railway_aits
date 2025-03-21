@@ -9,7 +9,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id','first_name','last_name','username','email','password','role','gender','year_of_study']
         
-        
 class Course_unitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course_unit
@@ -25,8 +24,6 @@ class ProgramSerializer(serializers.ModelSerializer):
         program = Program.objects.create(name=validated_data['program_name'])
         program.course_units.set(course_units) 
         return program
-
-
         
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -138,8 +135,7 @@ class Lecturer_and_Registrar_RegisterSerializer(serializers.ModelSerializer):
         group,created = Group.objects.get_or_create(name = role)
         user.groups.add(group)
         return user
-    
-    
+
 class Registration_Token_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Registration_Token
@@ -153,3 +149,6 @@ class Registration_Token_Serializer(serializers.ModelSerializer):
         if CustomUser.objects.filter(email = data.get('email')).exists():
             raise serializers.ValidationError(f'The email {data.get('email')} is already taken')
         return data
+    
+class Verify_Email_serializer(serializers.Serializer):
+    code = serializers.IntegerField()

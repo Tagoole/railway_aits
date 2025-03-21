@@ -3,11 +3,9 @@ from rest_framework.response import Response
 from .serializers import *
 from rest_framework.decorators import APIView, api_view
 from .models import *
-from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from django.contrib.auth.models import Group
-from django.core.mail import send_mail,EmailMessage,EmailMultiAlternatives
+from django.core.mail import send_mail
 from django.conf import settings
 from random import randint
 
@@ -21,13 +19,10 @@ class IssueViewSet(ModelViewSet):
         context.update({"request": self.request})
         return context
     
-    
-    
 class DepartmentViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-
 
 class Course_unitViewSet(ModelViewSet):
     queryset = Course_unit.objects.all()
@@ -69,7 +64,6 @@ class Lecturer_and_Registrar_Registration(APIView):
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
     
 class Student_Registration(APIView):
     permission_classes = [AllowAny]
@@ -137,5 +131,35 @@ class Registration_Token_viewset(ModelViewSet):
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-
+@api_view(['POST'])
+def verify_email(request):
+    data = request.data
+    verification_code = data.get('code')
+    user = data.get('user')
     
+    try:
+        verification = Verification_code.objects.get(code = verification_code)
+        
+        if verification.is_verification_code_expired():
+            return Response({'error':'Verification Code has expired..'},status = status.HTTP_400_BAD_REQUEST)
+        
+        verification.is_verified = True
+        verification.save()
+        user_verification = CustomUser.objects.get(user = user)
+        
+        if user_verification:
+            user_verification.is_email_verified = True
+            user_verification.save()
+            
+            return Response({'Message':'Email verified successfully...'},status = status.HTTP_200_OK)
+        
+        
+    except Verification_code.DoesNotExist():
+        return Response({'error':'Invalid Verification code'},status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+def resend_verification_code(request):
+    pass
+  
+  
+      
