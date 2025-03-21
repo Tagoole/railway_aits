@@ -30,8 +30,6 @@ class CustomUser(AbstractUser):
     
     def __str__(self):
         return self.username
-    
-   
 
 class Department(models.Model):
     department_name = models.CharField(max_length=100, unique = True) 
@@ -40,8 +38,6 @@ class Department(models.Model):
     def __str__(self):
         return self.department_name
     
-    
-
 class Course_unit(models.Model):
     course_unit_code = models.CharField(max_length=10)
     course_unit_name = models.CharField(max_length=200)
@@ -55,8 +51,7 @@ class Program(models.Model):
     
     def __str__(self):
         return self.program_name
-
-
+    
 # User doesnot need to select program because it is already in the system
 class Issue(models.Model):
     ISSUE_CHOICES = [

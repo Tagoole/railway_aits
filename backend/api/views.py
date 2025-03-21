@@ -1,7 +1,7 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
 from rest_framework.response import Response
 from .serializers import *
-from rest_framework.decorators import APIView, api_view
+from rest_framework.decorators import APIView,api_view
 from .models import *
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -10,7 +10,7 @@ from django.conf import settings
 from random import randint
 
 class IssueViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     
@@ -19,6 +19,17 @@ class IssueViewSet(ModelViewSet):
         context.update({"request": self.request})
         return context
     
+class Registrar_Issue_ManagementViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = IssueSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Issue.objects.filter(registrar = user)
+    
+
+
+
 class DepartmentViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Department.objects.all()
