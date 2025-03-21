@@ -22,9 +22,6 @@ class Registrar_Issue_ManagementViewSet(ModelViewSet):
         user = self.request.user
         return Issue.objects.filter(registrar = user)
     
-
-
-
 class DepartmentViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Department.objects.all()
@@ -86,6 +83,7 @@ class Student_Registration(APIView):
                 defaults={"code": verification_code})
             
             verification.code = verification_code
+            verification_code.created_at = timezone.now()
             verification.save()
             
             '''Sending the email...'''
@@ -140,28 +138,32 @@ class Registration_Token_viewset(ModelViewSet):
 @api_view(['POST'])
 def verify_email(request):
     data = request.data
-    verification_code = data.get('code')
-    user = data.get('user')
-    
-    try:
-        verification = Verification_code.objects.get(code = verification_code)
+    serializer = Verify_Email_serializer(data = data)
+    if serializer.is_valid():
+        verification_code = data.get('code')
+        user = data.get('user')
         
-        if verification.is_verification_code_expired():
-            return Response({'error':'Verification Code has expired..'},status = status.HTTP_400_BAD_REQUEST)
-        
-        verification.is_verified = True
-        verification.save()
-        user_verification = CustomUser.objects.get(user = user)
-        
-        if user_verification:
-            user_verification.is_email_verified = True
-            user_verification.save()
+        try:
+            verification = Verification_code.objects.get(code = verification_code)
             
-            return Response({'Message':'Email verified successfully...'},status = status.HTTP_200_OK)
-        
-        
-    except:
-        return Response({'error':'Invalid Verification code'},status = status.HTTP_400_BAD_REQUEST)
+            if verification.is_verification_code_expired():
+                return Response({'error':'Verification Code has expired..'},status = status.HTTP_400_BAD_REQUEST)
+            
+            verification_code.created_at = timezone.now()
+            verification.is_verified = True
+            verification.save()
+            user_verification = CustomUser.objects.get(user = user)
+            
+            if user_verification:
+                user_verification.is_email_verified = True
+                user_verification.save()
+                
+                return Response({'Message':'Email verified successfully...'},status = status.HTTP_200_OK)
+            
+            
+        except:
+            return Response({'error':'Invalid Verification code'},status = status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
 def resend_verification_code(request):
@@ -191,11 +193,72 @@ def resend_verification_code(request):
         
     except Exception as e:
         return Response({'Error':f'{e}'})
-    
-    
 
 @api_view(['POST'])
 def password_reset_code(request):
-    pass  
-  
-      
+    serializer = Password_ResetSerializer(data = request.data)
+    if serializer.is_valid():
+        email = serializer.validated_data.get('email')
+        
+        try:
+            user = CustomUser.objects.get(email = email)
+        except Exception as e:
+            return Response({'Error': e})
+        
+        verification_code, created = Verification_code.objects.get_or_create(user=user)
+        verification_code.code = randint(100000, 999999)
+        verification_code.created_at = timezone.now()
+        verification_code.is_verified = False
+        verification_code.save()
+        
+        send_mail(
+            "Password Reset Code",
+            f"Your password reset code is {verification_code.code}. It will expire in 10 minutes.",
+            "no-reply@aits.com",
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response({"message": "Password reset code sent to email"}, status=status.HTTP_200_OK)
+        
+        
+    return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def verify_password_reset_code(request):
+    serializer = Verify_Password_Reset_CodeSerializer(data = request.data)
+    if serializer.is_valid():
+        code = serializer.validated_data.get('code')
+        user = serializer.validated_data.get('user')
+        
+        try:
+            get_code = Verification_code.objects.get(user = user, code = code) 
+        except Exception as e:
+            return Response({'Error':e},status= status.HTTP_400_BAD_REQUEST)
+        
+        if get_code.is_verification_code_expired():
+            return Response({"error": "Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Message':'Confirmed...'})
+        
+        
+        
+    return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
+        
+@api_view(['POST'])
+def final_password_reset(request):
+    serializer = Final_Password_ResetSerializer(data = request.data)
+    if serializer.is_valid():
+        password = serializer.validated_data.get('passsword')
+        confirm_password = serializer.validated_data.get('confirm_password')
+        user = serializer.validated_data.get('user')
+        
+        get_user = CustomUser.objects.get(user = user)
+        
+        get_user.set_password(password)
+        get_user.set_password(confirm_password)
+        
+        user.save()
+        
+        return Response({"message": "Password reset successful"}, status=status.HTTP_200_OK)
+    
+        

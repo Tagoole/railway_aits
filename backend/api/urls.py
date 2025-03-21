@@ -24,5 +24,9 @@ urlpatterns = [
     path("access_token/",TokenObtainPairView.as_view(),name = "access_token"),
     path("refresh_token/",TokenRefreshView.as_view(),name = "refresh_token"),
     path("verify_email/",verify_email,name='verify_email'),
-    path('resend_verify_code/',resend_verification_code,name='resend_verify_code')
+    path('resend_verify_code/',resend_verification_code,name='resend_verify_code'),
+    path('password_reset_code/',password_reset_code,name='password_reset_code'),
+    path('verify_password_reset_code/',verify_password_reset_code,name='verify_password_reset_code'),
+    path('final_password_reset/',final_password_reset,name='final_password_reset'),
+    
 ]
