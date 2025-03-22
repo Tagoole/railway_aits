@@ -19,6 +19,8 @@ router.register(r'student__issues', Student_Issue_ReadOnlyViewset, 'student_issu
 
 urlpatterns = [
     path('',include(router.urls)),
+    # remove the users
+    path('users/',get_users,name='users'),
     path('register_student_user/',Student_Registration.as_view(),name = 'register_student_user'),
     path('register_lect_and_registrar/',Lecturer_and_Registrar_Registration.as_view(),name='register_lect_and_registrar'),
     path("access_token/",TokenObtainPairView.as_view(),name = "access_token"),

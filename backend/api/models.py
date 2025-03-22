@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import shortuuid
+from random import randint
 from django.utils import timezone
-
+from django.conf import settings
+from django.core.mail import send_mail
 # add other option in issue dropdown
 class CustomUser(AbstractUser):
     GENDER_CHOICES = [
@@ -122,5 +124,25 @@ class Verification_code(models.Model):
         expiration_time = self.created_at + timezone.timedelta(minutes=10)
         return timezone.now() > expiration_time
     
+    @classmethod
+    def resend_verification_code(cls,user):
+        try:
+            cls.objects.filter(user = user).delete()
+    
+            new_verification_code = randint(10000,99999)
+            verification = cls.objects.create(user = user,code= new_verification_code)
+        except Exception as e:
+            return {'Error':e}
+
+        try:
+            subject = 'Email verification Code Resend..'
+            message = f"Hello, your Verification code that has been resent is: {new_verification_code}"
+            receipient_email= user.email
+            send_mail(subject,message,settings.EMAIL_HOST_USER,[receipient_email],fail_silently=False)
+        except Exception as e:
+            return {'Error':e}
+        
+        return {'Message':'Email verification code resent successfully...'}
+        
     def __str__(self):
-        return f'Verification for {self.user.username} '
+        return f'Verification for {self.user.username} --- {self.code}'

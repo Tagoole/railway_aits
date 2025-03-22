@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id','first_name','last_name','username','email','password','role','gender','year_of_study']
+        fields = ['id','first_name','last_name','username','email','password','role']
         
 class Course_unitSerializer(serializers.ModelSerializer):
     class Meta:
@@ -152,6 +152,10 @@ class Registration_Token_Serializer(serializers.ModelSerializer):
     
 class Verify_Email_serializer(serializers.Serializer):
     code = serializers.IntegerField()
+    email = serializers.EmailField()
+    
+class Resend_Verification_CodeSerializer(serializers.Serializer):
+    email = serializers.EmailField() 
     
     
 class Password_ResetSerializer(serializers.Serializer):
