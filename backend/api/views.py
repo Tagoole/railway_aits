@@ -52,6 +52,10 @@ class Registrar_Issue_ManagementViewSet(ModelViewSet):
         issue = serializer.save()
         self.send_email_on_update(issue,"updated")
         return issue
+    
+    def perform_destroy(self, instance):
+        self.send_email_on_update(instance,"deleted")
+        instance.delete()
             
     
     
