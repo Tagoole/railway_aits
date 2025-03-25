@@ -4,23 +4,14 @@ from .serializers import *
 from rest_framework.decorators import APIView,api_view
 from .models import *
 from rest_framework import status
+from .permissions import *
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.core.mail import send_mail
 from django.conf import settings
 from random import randint
-'''     To be removed after..'''
-@api_view(['GET'])
-def get_users(request):
-    serializer = UserSerializer(data = request.data)
-    if serializer.is_valid():
-        return CustomUser.objects.all()
-    return Response(serializer.errors,status= status.HTTP_400_BAD_REQUEST)
-    
-    
-
 
 class IssueViewSet(ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated,IsStudent]
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     
@@ -48,6 +39,22 @@ class Registrar_Issue_ManagementViewSet(ModelViewSet):
         user = self.request.user
         return Issue.objects.filter(registrar = user)
     
+    def send_email_on_update(self,issue,action):
+        student = issue.student
+        
+        if student and student.email:
+            subject = f'Issue {action} Notification..'
+            message = f'Dear {student.username},... Your issue of {issue.issue_type} has been {action}.. Best regards.. AITS..'
+            
+            send_mail(subject,message,settings.EMAIL_HOST_USER,[student.email],fail_silently=False)
+            
+    def perform_update(self, serializer):
+        issue = serializer.save()
+        self.send_email_on_update(issue,"updated")
+        return issue
+            
+    
+    
 class DepartmentViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Department.objects.all()
@@ -72,7 +79,6 @@ class Lecturer_and_Registrar_Registration(APIView):
         if token_object:
             data['role'] = token_object.role 
             data['is_email_verified'] = True
-            print("Updated data:", data)
             
             
         serializer = Lecturer_and_Registrar_RegisterSerializer(data=data)
@@ -197,8 +203,6 @@ def resend_verification_code(request):
     data = request.data
     serializer = Resend_Verification_CodeSerializer(data = data)
     if serializer.is_valid():
-        
-        print(data)
         user_email = serializer.validated_data.get('email')
         try:
             user = CustomUser.objects.get(email = user_email)
@@ -206,7 +210,6 @@ def resend_verification_code(request):
             return Response({'Error':'No user found...'})
         
         result = Verification_code.resend_verification_code(user = user)
-        print(result)
         if result:
             return Response({'Message':f'Successful.....'},status=status.HTTP_200_OK)
         return Response({'Error':'Failure...........--'},status=status.HTTP_400_BAD_REQUEST)

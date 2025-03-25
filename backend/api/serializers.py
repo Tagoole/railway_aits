@@ -74,6 +74,7 @@ class Student_RegisterSerializer(serializers.ModelSerializer):
         """Create a new user with hashed password."""
         password = validated_data.pop('password')  # Extract password
         validated_data["role"] = 'student'
+        validated_data["is_active"] = True
         validated_data["token"] = None
         print(validated_data)
         
@@ -116,7 +117,7 @@ class Lecturer_and_Registrar_RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create a new user with hashed password."""
-        print(validated_data)
+        validated_data["is_active"] = True
         password = validated_data.pop('password')  # Extract password
         role = validated_data.get('role')
         groups = validated_data.pop('groups', []) if 'groups' in validated_data else []
