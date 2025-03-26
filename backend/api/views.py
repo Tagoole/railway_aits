@@ -23,6 +23,41 @@ class Lecturer_Issue_Manangement(ModelViewSet):
         user = self.request.user
         return Issue.objects.filter(lecturer = user)
     
+    def send_email_on_update(self,issue,action,previous_state):
+        student = issue.student
+        
+        if student and student.email:
+            subject = f'Issue {action} Notification'
+            if previous_state:
+                message = (f'Dear {student.username},\n\n'
+                           f'Your issue of {issue.issue_type} has been {action}.\n'
+                           f'Previous status: {previous_state}\n'
+                           f'Current status: {issue.status}\n\n'
+                           'Best regards,\nAITS')
+            else:
+                message = (f'Dear {student.username},\n\n'
+                           f'Your issue of {issue.issue_type} has been {action}.\n'
+                           f'Current status: {issue.status}\n\n'
+                           'Best regards,\nAITS')
+            
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [student.email], fail_silently=False)
+    
+    def perform_update(self, serializer):
+        issue = self.get_object()  # This retrieves the current issue instance
+        previous_state = issue.status  # Store the previous state of the issue
+        
+        # Save the updated issue
+        updated_issue = serializer.save()
+        
+        # Send email with previous and current state
+        self.send_email_on_update(updated_issue, "updated", previous_state)
+        
+        return updated_issue
+            
+    def perform_destroy(self, instance):
+        self.send_email_on_update(instance,"deleted")
+        instance.delete()
+    
 class Student_Issue_ReadOnlyViewset(ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = IssueSerializer
