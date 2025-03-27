@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
-
+import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,12 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-79&fi0tp(_k99tyzr3)t0p*zh^jix&=@7t*_hmrxqbw^6z2%2@'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-79&fi0tp(_k99tyzr3)t0p*zh^jix&=@7t*_hmrxqbw^6z2%2@')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+
+#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
@@ -53,6 +57,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware'
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -86,7 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -94,6 +99,27 @@ DATABASES = {
     }
 }
 
+
+DATABASES = {
+    'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'xNgoIPbNHOpWNiZJGXGFUXTuxKiZpNNU',
+        'HOST': 'postgres.railway.internal',
+        'PORT': '5432',
+    }
+}
+
+'''
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default= 'postgresql://postgres:mGtKoNcjOvrcwSBLSTfXwXpphinffBse@shinkansen.proxy.rlwy.net:13832/railway'
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
